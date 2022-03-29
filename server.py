@@ -1,3 +1,4 @@
+from re import M
 from fastapi import FastAPI, Request, Form, File, UploadFile
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
@@ -9,12 +10,13 @@ import numpy as np
 import torch
 import base64
 import random
+import config 
 
 app = FastAPI()
 templates = Jinja2Templates(directory = 'templates')
 
 model_selection_options = ['yolov5s','yolov5m','yolov5l','yolov5x']
-model_dict = {model_name: None for model_name in model_selection_options} #set up model cache
+model_dict = {model_name: None for model_name in model_selection_options} #set up model cache (all None to begin with)
 
 colors = [tuple([random.randint(0, 255) for _ in range(3)]) for _ in range(100)] #for bbox plotting
 
@@ -50,7 +52,9 @@ def about_us(request: Request):
 async def detect_via_web_form(request: Request,
 							file_list: List[UploadFile] = File(...), 
 							model_name: str = Form(...),
-							img_size: int = Form(640)):
+							img_size: int = Form(640),
+							conf: float = Form(0.5),
+							iou: float = Form(0.45)):
 	
 	'''
 	Requires an image file upload, model name (ex. yolov5s). Optional image size parameter (Default 640).
@@ -60,7 +64,11 @@ async def detect_via_web_form(request: Request,
 
 	#assume input validated properly if we got here
 	if model_dict[model_name] is None:
-		model_dict[model_name] = torch.hub.load('ultralytics/yolov5', model_name, pretrained=True)
+		model_dict[model_name] = torch.hub.load('ultralytics/yolov5', 'custom', path=f"{config.MODEL_PATH}{model_name}")
+
+	# set the model conf and iou parameters
+	model_dict[model_name].conf = conf
+	model_dict[model_name].iou = iou
 
 	img_batch = [cv2.imdecode(np.fromstring(await file.read(), np.uint8), cv2.IMREAD_COLOR)
 					for file in file_list]
@@ -98,6 +106,8 @@ async def detect_via_api(request: Request,
 						file_list: List[UploadFile] = File(...), 
 						model_name: str = Form(...),
 						img_size: Optional[int] = Form(640),
+						conf: Optional [float] = Form(0.5),
+						iou: Optional [float] = Form(0.45),
 						download_image: Optional[bool] = Form(False)):
 	
 	'''
@@ -112,7 +122,9 @@ async def detect_via_api(request: Request,
 	'''
 
 	if model_dict[model_name] is None:
-		model_dict[model_name] = torch.hub.load('ultralytics/yolov5', model_name, pretrained=True)
+		model_dict[model_name] = torch.hub.load('ultralytics/yolov5', 'custom', path=f"{config.MODEL_PATH}{model_name}")
+		model_dict[model_name].conf = conf
+		model_dict[model_name].iou = iou
 
 	img_batch = [cv2.imdecode(np.fromstring(await file.read(), np.uint8), cv2.IMREAD_COLOR)
 					for file in file_list]
@@ -121,7 +133,7 @@ async def detect_via_api(request: Request,
 	#using cvtColor instead of [...,::-1] to keep array contiguous in RAM
 	img_batch_rgb = [cv2.cvtColor(img, cv2.COLOR_BGR2RGB) for img in img_batch]
 	
-	results = model_dict[model_name](img_batch_rgb, size = img_size) 
+	results = model_dict[model_name](img_batch_rgb, size = img_size)
 	json_results = results_to_json(results,model_dict[model_name])
 
 	if download_image:
@@ -178,6 +190,16 @@ def base64EncodeImage(img):
 
 	return im_b64
 
+def copy_attr(a, b, include=(), exclude=()):
+    """ Load in custom training yolov5 weights.
+	Copy attributes from b to a, options to only include [...] and to exclude [...] """
+    for k, v in b.__dict__.items():
+        if (len(include) and k not in include) or k.startswith('_') or k in exclude:
+            continue
+        else:
+            setattr(a, k, v)
+
+
 if __name__ == '__main__':
 	import uvicorn
 	import argparse
@@ -188,8 +210,12 @@ if __name__ == '__main__':
 	opt = parser.parse_args()
 
 	if opt.precache_models:
-		model_dict = {model_name: torch.hub.load('ultralytics/yolov5', model_name, pretrained=True) 
-						for model_name in model_selection_options}
-	
+		conf = 0.5
+		iou = 0.45
+		for model_name in model_selection_options: # Load model into model_dict
+			model_dict[model_name] = torch.hub.load('ultralytics/yolov5', 'custom', path=f"{config.MODEL_PATH}{model_name}")
+			model_dict[model_name].conf = conf
+			model_dict[model_name].iou = iou
+		
 	app_str = 'server:app' #make the app string equal to whatever the name of this file is
 	uvicorn.run(app_str, host= opt.host, port=opt.port, reload=True)

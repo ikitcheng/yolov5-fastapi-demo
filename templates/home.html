@@ -1,31 +1,181 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<h5>Upload image(s) and select a YOLOv5 model</h5>
 
-<hr/>
+<head>
+  <style>
+    .yolov5-plate-waste {
+    max-width: 800px;
+    margin: 50px auto;
+    position: relative;
+  
+  }
+  .yolov5-plate-waste .title {
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    font-size: 3.2em;
+    line-height: 48px;
+    padding-bottom: 48px;
+       color: #5543ca;
+      background: #5543ca;
+      background: -moz-linear-gradient(left,#f4524d  0%,#5543ca 100%) !important;
+      background: -webkit-linear-gradient(left,#f4524d  0%,#5543ca 100%) !important;
+      background: linear-gradient(to right,#f4524d  0%,#5543ca  100%) !important;
+      -webkit-background-clip: text !important;
+      -webkit-text-fill-color: transparent !important;
+  }
+  
+  .input-form .form-field {
+    position: relative;
+    margin: 32px 0;
+  }
+  .input-form .input-text {
+    display: block;
+    width: 100%;
+    height: 36px;
+    border-width: 0 0 2px 0;
+    border-color: #5543ca;
+    font-size: 18px;
+    line-height: 26px;
+    font-weight: 400;
+  }
+  .input-form .input-text:focus {
+    outline: none;
+  }
+  .input-form .input-text:focus + .label,
+  .input-form .input-text.not-empty + .label {
+    -webkit-transform: translateY(-24px);
+            transform: translateY(-24px);
+  }
+  
+  .input-form .form-label {
+    position: absolute;
+    top: -30px;
+    left: 15px;
+    bottom: 50px;
+    font-size: 18px;
+    line-height: 26px;
+    font-weight: 400;
+    color: #5543ca;
+  }
+  
+  .input-form .label {
+    position: absolute;
+    left: 20px;
+    bottom: 11px;
+    font-size: 18px;
+    line-height: 26px;
+    font-weight: 400;
+    color: #5543ca;
+    cursor: text;
+    transition: -webkit-transform .2s ease-in-out;
+    transition: transform .2s ease-in-out;
+    transition: transform .2s ease-in-out, 
+    -webkit-transform .2s ease-in-out;
+  }
 
-<form method="post" action="" enctype="multipart/form-data">
-  <div class="mb-3">
-    <label for="file_list" class="form-label">Upload Images</label>
-    <input class="form-control w-auto" type="file" name="file_list" id="file_list" multiple>
-  </div>
-  <div class="mb-3">
-    <div class="form-group">
-      <label>Select YOLO Model</label>
-    </div>
-    <select class="form-select w-auto" name="model_name">
-      {% for selection in model_selection_options %}
-        <option value="{{ selection }}">{{ selection }}</option>
-      {% endfor %}      
-    </select>
-  </div>
-  <div class="mb-3">
-    <label for="img_size_input" class="form-label">Model Inference Size</label>
-    <input type="text" class="form-control w-auto" id="img_size_input" name="img_size" value="640">
-  </div>
+  .input-form .submit-btn {
+    display: block;
+    width: 100%;
+    height: auto;
+    margin-left: auto;
+    margin-right: auto;
+    background-color: #000;
+     background-image: linear-gradient(125deg,#a72879,#064497);
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-size: 16px;
+    padding: 8px 16px;
+    border: none;
+    width:200px;
+    cursor: pointer;
+  } 
 
-  <button class="btn btn-primary" type="submit">Submit</button>
-</form>
+  .input-form .multi-range{
+    position:relative;
+    top:50%;
+    left:0%;
+    transform:translate(2%,-50%);
+    width:50px;
+    height:30px;
+    padding:0px;
+    padding-left:0px;
+    background:#fcfcfc;
+    border-radius:10px;
+    display:flex;
+    align-items:left;
+    box-shadow:0px 10px 30px #7E6D5766;
+    }
+    .input-form p {
+    font-size:16px;
+    font-weight:600;
+    font-family: Open Sans;
+    padding-left:160px;
+    padding-top:15px;
+    color:#7E6D57;
+    }
+    .input-form input[type="range"] {
+    -webkit-appearance:none !important;
+    width:150px;
+    height:2px;
+    background:#7E6D57;
+    border:none;
+    outline:none;
+    }
+    .input-form input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance:none !important;
+    width:15px;
+    height:15px;
+    background:#fcfcfc;
+    border:2px solid #7E6D57;
+    border-radius:50%;
+    cursor:pointer;
+    }
+    .input-form input[type="range"]::-webkit-slider-thumb:hover {
+    background:#7E6D57;
+    }
+  </style>
+</head>
+<!------ Include the above in your HEAD tag ---------->
+
+<section class="yolov5-plate-waste" >
+   <h1 class="title">Plate Waste Detection</h1>
+   <hr/>
+   <form class="input-form row" method="post" action="" enctype="multipart/form-data">
+      <div class="form-field col-lg-6">
+        <label for="file_list" class="form-label">Upload Image(s)</label>
+        <input class="form-control w-auto" type="file" name="file_list" id="file_list" multiple>
+      </div>
+      <div class="form-field col-lg-6">
+        <div class="form-group">
+          <label class="form-label">Select YOLOv5 Model</label>
+        </div>
+        <select class="form-select w-auto" name="model_name">
+          {% for selection in model_selection_options %}
+            <option value="{{ selection }}">{{ selection }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-field col-lg-4">
+        <label for="img_size_input" class="form-label">Model Inference Size</label>
+        <input type="text" class="form-control w-auto" id="img_size_input" name="img_size" value="640">
+      </div>
+      <div class="form-field col-lg-4">
+        <label for="conf_input" class="form-label">Confidence threshold</label>
+        <input type="range" class="multi-range" id="conf_input" name="conf" value="0.5" min="0" max="1" step="0.01" oninput="conf_value.innerText = this.value">
+        <p id="conf_value">0.5</p>
+      </div>
+      <div class="form-field col-lg-4">
+        <label for="iou_input" class="form-label">IOU threshold</label>
+        <input type="range" class="multi-range" id="iou_input" name="iou" value="0.45" min="0" max="1" step="0.01" oninput="iou_value.innerText = this.value">
+        <p id="iou_value" class="">0.45</p>
+      </div>
+      <div class="form-field col-lg-12">
+         <input class="submit-btn" type="submit" value="Submit">
+      </div>
+   </form>
+</section>
 
 {% endblock %}
