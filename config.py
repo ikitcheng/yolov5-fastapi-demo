@@ -1,6 +1,7 @@
 # backend/config.py
 
-MODEL_PATH = "./models/"
+PATH_TO_MODEL = "./models/"
+PATH_TO_DATA = "./data/"
 
 MODELS = {
     "small": "yolov5s",
