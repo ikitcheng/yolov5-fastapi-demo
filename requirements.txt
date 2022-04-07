@@ -7,6 +7,7 @@ jinja2
 aiofiles
 python-multipart
 requests
+openpyxl
 
 # Other stuff from https://github.com/ultralytics/yolov5/blob/master/requirements.txt
 # base ----------------------------------------
@@ -35,5 +36,5 @@ pandas
 
 # extras --------------------------------------
 thop  # FLOPS computation
-pycocotools>=2.0  # COCO mAP
 torchvision>=0.8.1
+# pycocotools>=2.0  COCO mAP

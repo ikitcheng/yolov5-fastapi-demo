@@ -204,10 +204,12 @@ def results_to_json(results, model):
             bbox_pix_coord = [int(x) for x in pred[:4].tolist()]
             area = round(waste.calc_area(bbox_pix_coord), 2)
             weight = round(waste.calc_weight(area, class_name), 2)
+            class_name_edible = waste.classify_edible_inedible(class_name)
             result_json.append(
                 {
                     "class": int(pred[5]),
                     "class_name": class_name,
+                    "(in)edible":class_name_edible,
                     "bbox": bbox_pix_coord,  # convert bbox results to int from float
                     "area": area,  # physical area of bounding box (estimate)
                     "weight": weight,  # physical weight of food (estimate)
@@ -270,7 +272,7 @@ if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--host", default="localhost")
+    parser.add_argument("--host", default="0.0.0.0") # '0.0.0.0' = 'all interfaces' allows external connections into container
     parser.add_argument("--port", default=8000)
     parser.add_argument(
         "--precache-models",

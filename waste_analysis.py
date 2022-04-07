@@ -31,3 +31,40 @@ def calc_weight(area, class_name):
     volume = FOOD_AREA_FACTOR * area * thickness
     weight = volume * density # 1 ml = 1 cm^3
     return weight
+
+def classify_edible_inedible(class_name):
+    """ Classify detected plate waste as Edible or Inedible. 
+
+    Args:
+        class_name (str): Plate waste name. 
+    Returns:
+        str : 'Edible' or 'Inedible'
+    """
+
+    plate_waste_classes = {'Apple-core':'Inedible',
+                           'Apple-peel':'Inedible',
+                           'Bone':'Inedible',
+                           'Bone-fish':'Inedible',
+                            'Bread':'Edible',
+                            'Bun':'Edible',
+                            'Egg-hard':'Edible',
+                            'Egg-shell':'Inedible',
+                            'Egg-steam':'Edible',
+                            'Egg-yolk':'Edible',
+                            'Fish':'Edible',
+                            'Meat':'Edible',
+                            'Noodle':'Edible',
+                            'Orange':'Edible',
+                            'Orange-peel':'Inedible',
+                            'Other-waste':'Inedible',
+                            'Pancake':'Edible',
+                            'Pasta':'Edible',
+                            'Pear-peel':'Inedible',
+                            'Potato':'Edible',
+                            'Rice':'Edible',
+                            'Shrimp':'Edible',
+                            'Shrimp-shell':'Inedible',
+                            'Tofu':'Edible',
+                            'Vegetable':'Edible'}
+    
+    return plate_waste_classes[class_name]

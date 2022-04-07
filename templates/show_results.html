@@ -15,6 +15,7 @@ to stop the form from redirecting -->
 <thead>
   <tr>
     <th>Class</th>
+    <th>(In)edible</th>
     <th>Bounding Box [x1, y1, x2, y2]</th>
     <th>Area (cm<sup>2</sup>)</th>
     <th>Weight (g)</th>
@@ -24,6 +25,7 @@ to stop the form from redirecting -->
   {% for bbox in bbox_list %}
     <tr>
       <td>{{ bbox['class_name'] }}</td>
+      <td>{{ bbox['(in)edible'] }}</td>
       <td>{{ bbox['bbox'] }}</td>
       <td>{{ bbox['area'] }}</td>
       <td>{{ bbox['weight'] }}</td>
