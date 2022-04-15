@@ -17,19 +17,31 @@ def calc_area(bbox_pix_coord, pix2cm2_factor=0.05):
     area = ((x2-x1) * (y2-y1)) * pix2cm2_factor
     return area
     
-def calc_weight(area, class_name):
+def calc_weight(df, area, class_name):
     """Calculate the weight of food in bounding box. 
 
     Args:
+        df (pd.DataFrame): Dataframe of food densities (in g/ml or g/cm3).
         weight (float): Weight of food (in grams).
         class_name (str): Name of food in bounding box. 
     """
-    df = pd.read_excel(f"{config.PATH_TO_DATA}food_density_data.xlsx", index_col=0)
-    density = df.loc[class_name.lower(), 'Density (g/ml)']
-    thickness = df.loc[class_name.lower(), 'Thickness (cm)']
-    FOOD_AREA_FACTOR = 0.8
-    volume = FOOD_AREA_FACTOR * area * thickness
-    weight = volume * density # 1 ml = 1 cm^3
+    class_name = class_name.lower()
+
+    if class_name in df.index:
+        density = df.loc[class_name, 'Density (g/ml)']
+        thickness = df.loc[class_name, 'Thickness (cm)']
+        FOOD_AREA_FACTOR = 0.8
+        volume = FOOD_AREA_FACTOR * area * thickness
+        weight = volume * density # 1 ml = 1 cm^3
+    else:
+        if class_name == 'apple':
+            weight = 133. #grams (medium)
+        elif class_name == 'orange':
+            weight = 190. #grams (medium)
+        elif class_name == 'pear':
+            weight = 180. #grams (medium)
+        elif class_name == 'banana':
+            weight = 120. #grams (medium)
     return weight
 
 def classify_edible_inedible(class_name):
@@ -41,8 +53,10 @@ def classify_edible_inedible(class_name):
         str : 'Edible' or 'Inedible'
     """
 
-    plate_waste_classes = {'Apple-core':'Inedible',
+    plate_waste_classes = {'Apple':'Edible',
+                           'Apple-core':'Inedible',
                            'Apple-peel':'Inedible',
+                           'Banana':'Edible',
                            'Bone':'Inedible',
                            'Bone-fish':'Inedible',
                             'Bread':'Edible',
@@ -59,6 +73,7 @@ def classify_edible_inedible(class_name):
                             'Other-waste':'Inedible',
                             'Pancake':'Edible',
                             'Pasta':'Edible',
+                            'Pear':'Edible',
                             'Pear-peel':'Inedible',
                             'Potato':'Edible',
                             'Rice':'Edible',

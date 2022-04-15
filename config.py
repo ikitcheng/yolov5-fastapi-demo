@@ -1,5 +1,4 @@
 # backend/config.py
-
 PATH_TO_MODEL = "./models/"
 PATH_TO_DATA = "./data/"
 

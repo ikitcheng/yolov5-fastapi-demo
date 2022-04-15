@@ -3,6 +3,7 @@ from fastapi import FastAPI, Request, Form, File, UploadFile, HTTPException
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 from typing import List, Optional
+import pandas as pd
 
 import cv2
 import numpy as np
@@ -197,13 +198,14 @@ async def detect_via_api(
 def results_to_json(results, model):
     """Converts yolo model output to json (list of list of dicts)"""
     results_json = []
+    df = pd.read_excel(f"{config.PATH_TO_DATA}food_density_data.xlsx", index_col=0)
     for result in results.xyxy:  # for each image
         result_json = []
         for pred in result:  # for each prediction in image
             class_name = model.model.names[int(pred[5])]
             bbox_pix_coord = [int(x) for x in pred[:4].tolist()]
             area = round(waste.calc_area(bbox_pix_coord), 2)
-            weight = round(waste.calc_weight(area, class_name), 2)
+            weight = round(waste.calc_weight(df, area, class_name), 2)
             class_name_edible = waste.classify_edible_inedible(class_name)
             result_json.append(
                 {
