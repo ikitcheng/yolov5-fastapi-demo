@@ -1,9 +1,10 @@
-from re import M
-from fastapi import FastAPI, Request, Form, File, UploadFile, HTTPException
+from fastapi import FastAPI, Request, Form, File, UploadFile
 from fastapi.templating import Jinja2Templates
-from pydantic import BaseModel
 from typing import List, Optional
 import pandas as pd
+import os
+import uvicorn
+import argparse
 
 import cv2
 import numpy as np
@@ -270,12 +271,11 @@ def copy_attr(a, b, include=(), exclude=()):
 
 
 if __name__ == "__main__":
-    import uvicorn
-    import argparse
+    port = os.getenv('PORT', default=8000) # Open port for deployment to heroku. See more at: https://stackoverflow.com/questions/56160614/heroku-docker-image-requires-an-open-port
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--host", default="0.0.0.0") # '0.0.0.0' = 'all interfaces' allows external connections into container
-    parser.add_argument("--port", default=8000)
+    parser.add_argument("--host", default="0.0.0.0", type=str) # '0.0.0.0' = 'all interfaces' allows external connections into container
+    parser.add_argument("--port", default=port, type=int)
     parser.add_argument(
         "--precache-models",
         action="store_true",

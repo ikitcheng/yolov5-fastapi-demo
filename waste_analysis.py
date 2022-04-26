@@ -10,6 +10,8 @@ def calc_area(bbox_pix_coord, pix2cm2_factor=0.05):
 
     Args:
         bbox_pix_coord (list): A list of pixel coordinates [x1,y1,x2,y2].
+        pix2cm2_factor (float): The pixel to cm conversion factor. 
+            This depends on the distance between camera the food.
     Returns: 
         area (float): Area (in cm2) of bounding box (assuming all images taken from fixed height).
     """
