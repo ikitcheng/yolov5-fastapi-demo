@@ -17,7 +17,7 @@ import waste_analysis as waste
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
 
-model_selection_options = ["yolov5s", "yolov5m", "yolov5l", "yolov5x"]
+model_selection_options = ["yolov5s"]#, "yolov5m", "yolov5l", "yolov5x"]
 model_dict = {
     model_name: None for model_name in model_selection_options
 }  # set up model cache (all None to begin with)
