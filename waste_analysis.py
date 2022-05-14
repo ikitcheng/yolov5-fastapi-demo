@@ -5,8 +5,8 @@
 import pandas as pd
 import config
 
-def calc_area(bbox_pix_coord, pix2cm2_factor=0.05):
-    """Calculate the area of each bounding box. 
+def calc_area(bbox_pix_coord, pix2cm2_factor):
+    """Calculate the area of each bounding box.
 
     Args:
         bbox_pix_coord (list): A list of pixel coordinates [x1,y1,x2,y2].
@@ -64,6 +64,7 @@ def classify_edible_inedible(class_name):
                             'Bread':'Edible',
                             'Bun':'Edible',
                             'Egg-hard':'Edible',
+                            'Egg-scramble':'Edible',
                             'Egg-shell':'Inedible',
                             'Egg-steam':'Edible',
                             'Egg-yolk':'Edible',
@@ -76,6 +77,7 @@ def classify_edible_inedible(class_name):
                             'Pancake':'Edible',
                             'Pasta':'Edible',
                             'Pear':'Edible',
+                            'Pear-core':'Inedible',
                             'Pear-peel':'Inedible',
                             'Potato':'Edible',
                             'Rice':'Edible',

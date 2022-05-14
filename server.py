@@ -18,7 +18,7 @@ import waste_analysis as waste
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
 
-model_selection_options = ["yolov5s"]#, "yolov5m", "yolov5l", "yolov5x"]
+model_selection_options = ["yolov5s", "yolov5m"]#, "yolov5l", "yolov5x"]
 model_dict = {
     model_name: None for model_name in model_selection_options
 }  # set up model cache (all None to begin with)
@@ -205,7 +205,7 @@ def results_to_json(results, model):
         for pred in result:  # for each prediction in image
             class_name = model.model.names[int(pred[5])]
             bbox_pix_coord = [int(x) for x in pred[:4].tolist()]
-            area = round(waste.calc_area(bbox_pix_coord), 2)
+            area = round(waste.calc_area(bbox_pix_coord, pix2cm2_factor=1.25e-3), 2)
             weight = round(waste.calc_weight(df, area, class_name), 2)
             class_name_edible = waste.classify_edible_inedible(class_name)
             result_json.append(
@@ -269,7 +269,21 @@ def copy_attr(a, b, include=(), exclude=()):
         else:
             setattr(a, k, v)
 
+def precache_models():
+    # Load all models to memory before showing the web app so the inference will be very quick
+    conf = 0.5
+    iou = 0.45
+    for model_name in model_selection_options:  # Load model into model_dict
+        model_dict[model_name] = torch.hub.load(
+            "ultralytics/yolov5",
+            "custom",
+            path=f"{config.PATH_TO_MODEL}{model_name}",
+        )
+        model_dict[model_name].conf = conf
+        model_dict[model_name].iou = iou
 
+    return model_dict
+    
 if __name__ == "__main__":
     port = os.getenv('PORT', default=8000) # Open port for deployment to heroku. See more at: https://stackoverflow.com/questions/56160614/heroku-docker-image-requires-an-open-port
 
@@ -284,19 +298,8 @@ if __name__ == "__main__":
     opt = parser.parse_args()
 
     if opt.precache_models:
-        # Load all models to memory before showing the web app so the inference will be very quick
-        conf = 0.5
-        iou = 0.45
-        for model_name in model_selection_options:  # Load model into model_dict
-            model_dict[model_name] = torch.hub.load(
-                "ultralytics/yolov5",
-                "custom",
-                path=f"{config.PATH_TO_MODEL}{model_name}",
-            )
-            model_dict[model_name].conf = conf
-            model_dict[model_name].iou = iou
+        model_dict = precache_models()
 
-    app_str = (
-        "server:app"  # make the app string equal to whatever the name of this file is
-    )
+    # make the app string equal to whatever the name of this file is
+    app_str = ("server:app")
     uvicorn.run(app_str, host=opt.host, port=opt.port, reload=True)

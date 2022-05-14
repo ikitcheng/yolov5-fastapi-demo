@@ -1,0 +1,5 @@
+train: ../train/images
+val: ../valid/images
+
+nc: 29
+names: ['Apple', 'Apple-core', 'Apple-peel', 'Bone', 'Bone-fish', 'Bread', 'Bun', 'Egg-hard', 'Egg-scramble', 'Egg-shell', 'Egg-steam', 'Egg-yolk', 'Fish', 'Meat', 'Noodle', 'Orange', 'Orange-peel', 'Other-waste', 'Pancake', 'Pasta', 'Pear', 'Pear-core', 'Pear-peel', 'Potato', 'Rice', 'Shrimp', 'Shrimp-shell', 'Tofu', 'Vegetable']
