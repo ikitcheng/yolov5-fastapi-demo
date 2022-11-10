@@ -29,6 +29,8 @@ Models will automatically be downloaded the first time they are used and are cac
 * To run the server with docker , `cd` into directory of this readme file and run `docker-compose up -d --build`
 * Navigate to `http://localhost:8080`in browser.
 * To kill all containers, run `docker-compose down`
+* Build errors: 
+	- If container failed after build due to module not found error, add the required module into `requirements.txt` file. Rerun `docker-compose up -d --build`.
 
 ## API Documentation
 Full Swagger API endpoint documentation is auto-generated in `localhost:8000/docs`. The general idea is that humans use the "/" route (HTML form + inference results displayed in the browser) and programs use the "/detect/" API route to receive JSON inference results.

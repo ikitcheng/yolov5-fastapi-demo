@@ -44,6 +44,8 @@ def calc_weight(df, area, class_name):
             weight = 180. #grams (medium)
         elif class_name == 'banana':
             weight = 120. #grams (medium)
+        else: 
+            weight = 0 # not determined (yet)
     return weight
 
 def classify_edible_inedible(class_name):
@@ -70,6 +72,8 @@ def classify_edible_inedible(class_name):
                             'Egg-yolk':'Edible',
                             'Fish':'Edible',
                             'Meat':'Edible',
+                            'Mussel':'Edible',
+                            'Mussel-shell':'Inedible',
                             'Noodle':'Edible',
                             'Orange':'Edible',
                             'Orange-peel':'Inedible',
@@ -83,6 +87,7 @@ def classify_edible_inedible(class_name):
                             'Rice':'Edible',
                             'Shrimp':'Edible',
                             'Shrimp-shell':'Inedible',
+                            'Tomato':'Edible',
                             'Tofu':'Edible',
                             'Vegetable':'Edible'}
     

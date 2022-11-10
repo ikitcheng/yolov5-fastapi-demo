@@ -1,6 +1,10 @@
 # backend/config.py
-PATH_TO_MODEL = "./models/"
-PATH_TO_DATA = "./data/"
+from pathlib import Path
+
+ROOT_DIR = Path(__file__).parent
+
+PATH_TO_MODEL = ROOT_DIR / "models"
+PATH_TO_DATA = ROOT_DIR / "data"
 
 MODELS = {
     "small": "yolov5s",

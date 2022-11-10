@@ -81,7 +81,7 @@ async def detect_via_web_form(
     # assume input validated properly if we got here
     if model_dict[model_name] is None:
         model_dict[model_name] = torch.hub.load(
-            "ultralytics/yolov5", "custom", path=f"{config.PATH_TO_MODEL}{model_name}"
+            "ultralytics/yolov5", "custom", path=f"{config.PATH_TO_MODEL}/{model_name}"
         )
 
     # set the model conf and iou parameters
@@ -154,7 +154,7 @@ async def detect_via_api(
 
     if model_dict[model_name] is None:
         model_dict[model_name] = torch.hub.load(
-            "ultralytics/yolov5", "custom", path=f"{config.PATH_TO_MODEL}{model_name}"
+            "ultralytics/yolov5", "custom", path=f"{config.PATH_TO_MODEL}/{model_name}"
         )
 
     # set the model conf and iou parameters
@@ -199,14 +199,14 @@ async def detect_via_api(
 def results_to_json(results, model):
     """Converts yolo model output to json (list of list of dicts)"""
     results_json = []
-    df = pd.read_excel(f"{config.PATH_TO_DATA}food_density_data.xlsx", index_col=0)
+    df = pd.read_excel(f"{config.PATH_TO_DATA}/food_density_data.xlsx", index_col=0)
     for result in results.xyxy:  # for each image
         result_json = []
         for pred in result:  # for each prediction in image
             class_name = model.model.names[int(pred[5])]
             bbox_pix_coord = [int(x) for x in pred[:4].tolist()]
             area = round(waste.calc_area(bbox_pix_coord, pix2cm2_factor=1.25e-3), 2)
-            weight = round(waste.calc_weight(df, area, class_name), 2)
+            #weight = round(waste.calc_weight(df, area, class_name), 2)
             class_name_edible = waste.classify_edible_inedible(class_name)
             result_json.append(
                 {
@@ -215,7 +215,7 @@ def results_to_json(results, model):
                     "(in)edible":class_name_edible,
                     "bbox": bbox_pix_coord,  # convert bbox results to int from float
                     "area": area,  # physical area of bounding box (estimate)
-                    "weight": weight,  # physical weight of food (estimate)
+                    #"weight": weight,  # physical weight of food (estimate)
                     "confidence": float(pred[4]),
                 }
             )
@@ -277,7 +277,7 @@ def precache_models():
         model_dict[model_name] = torch.hub.load(
             "ultralytics/yolov5",
             "custom",
-            path=f"{config.PATH_TO_MODEL}{model_name}",
+            path=f"{config.PATH_TO_MODEL}/{model_name}",
         )
         model_dict[model_name].conf = conf
         model_dict[model_name].iou = iou
@@ -285,6 +285,11 @@ def precache_models():
     return model_dict
     
 if __name__ == "__main__":
+    """
+    Example: 
+    python server.py --precache-models
+    """
+
     port = os.getenv('PORT', default=8000) # Open port for deployment to heroku. See more at: https://stackoverflow.com/questions/56160614/heroku-docker-image-requires-an-open-port
 
     parser = argparse.ArgumentParser()
